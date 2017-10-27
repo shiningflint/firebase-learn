@@ -23,23 +23,54 @@ function firebaseInit() {
 function gameInit() {
   var button = document.getElementById('button');
   var score = document.getElementById('score');
+  var name = document.getElementById('name');
   var save = document.getElementById('save');
+  var results = document.getElementById('results');
   var value = 0;
   var firebase = firebaseInit();
 
   button.onclick = addScore;
   save.onclick = saveScore;
+  showScores();
 
-  function addScore(e) {
+  function addScore() {
     value += 1;
     return score.innerHTML = value;
   }
 
-  function saveScore(e) {
+  function saveScore() {
     var data = {
-      name: "Adum",
+      name: name.value,
       score: value,
     };
     firebase.push(data);
+  }
+
+  function showScores() {
+    firebase.on('value', gotData, errData);
+  }
+
+  function gotData(data) {
+    var scores = data.val();
+    var keys = Object.keys(scores);
+    results.innerHTML = "";
+    keys.map(function(val, index) {
+      var listnode = document.createElement("li");
+      var listnamescore = document.createElement("p");
+      listnamescore.innerHTML = scores[val].name + ': ' + scores[val].score;
+      listnode.appendChild(listnamescore);
+      results.appendChild(listnode);
+    });
+
+    function createItem(value) {
+      var p = document.createElement("p");
+      p.innerHTML = value;
+      return p;
+    }
+  }
+
+  function errData(err) {
+    console.log('Error!');
+    console.log(err);
   }
 }
